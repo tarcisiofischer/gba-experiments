@@ -16,6 +16,7 @@ function(gba_add_example)
     -fno-rtti
     -nostdlib
     -I${CMAKE_SOURCE_DIR}/examples/${arg_NAME}/
+    -I${CMAKE_SOURCE_DIR}/libgba/
   )
   target_link_options(
     ${arg_NAME} PRIVATE
