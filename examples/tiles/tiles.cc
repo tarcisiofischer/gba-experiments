@@ -1,42 +1,61 @@
 #include <types.h>
+#include <gba.h>
 
-#define REG_DISPCNT *(volatile u16_t*)0x04000000
-#define REG_BG0CNT *(volatile u16_t*)0x04000008
-
-#define MODE_0 0x0000
-#define BG0_ENABLE 0x0100
-
-#define TILE_BASE ((volatile u16_t*)0x06000000) // Character Block 0
 #define MAP_BASE ((volatile u16_t*)0x06008000)  // Screen Block 31
-#define BG_PALETTE ((volatile u16_t*)0x05000000)
 
 #define CHARBLOCK_0 (0 << 2)
-#define SCREENBLOCK_31 (31 << 8)
+#define SCREENBLOCK_31 (0 << 8)
 #define BG_SIZE_0 (0 << 14)
 
 void setup_graphics() {
-    // Set Mode 0 and enable BG0
-    REG_DISPCNT = MODE_0 | BG0_ENABLE;
+    *REG_DISPCNT = MODE_0 | BG0_ENABLE;
+    *REG_BG0CNT = 
+      (0b00    << 0)  | // Priority 0 (Highest)
+      (0b00    << 2)  | // Start addr of tile data 0x06000000 + S * 0x4000
+      (0b00    << 4)  | // Unused
+      (0b0     << 6)  | // Mosaic effect 0 (Off)
+      (0b0     << 7)  | // Use 16 color map
+      (0b00001 << 8)  | // Starting addr of tile map 0x06000000 + M * 0x800
+      (0b0     << 13) | // Screen over / RO
+      (0b00    << 15)   // Size of tile map. 0 means 32x32
+    ;
+    static auto const TILEMAP_PTR = (volatile u16_t*)(0x06000000 + 1 * 0x800);
+    static auto const TILESET_PTR = (volatile u16_t*)(0x06000000 + 0 * 0x400);
 
-    // Define a simple tile (8x8 pixels)
-    const u16_t tile_data[8] = {
-        0x1001, 0x1111,
-        0x0000, 0x1001,
-        0x1001, 0x1001,
-        0x1111, 0x1111
+    const u16_t tile_data[16] = {
+        0x0001, 0x3300,
+        0x0000, 0x3000,
+        0x0000, 0x0000,
+        0x0000, 0x0000,
+        0x0000, 0x0000,
+        0x0000, 0x0000,
+        0x0002, 0x0000,
+        0x0022, 0x1000
     };
 
-    BG_PALETTE[1] = 0x7C00;  // Set color index 1 to red
-    // Copy tile data to VRAM
-    for (int i = 0; i < 8; i++) {
-        TILE_BASE[i + 1] = tile_data[i];
+    BG_PALETTE[0] = 0x0000;
+    BG_PALETTE[1] = (0x1f << 0);
+    BG_PALETTE[2] = (0x1f << 5);
+    BG_PALETTE[3] = (0x1f << 10);
+    for (int i = 0; i < 16; i++) {
+        TILESET_PTR[16 + i] = tile_data[i];
     }
 
-    // Place tile 0 at (0,0) in the map
-    MAP_BASE[0] = 0;
+    TILEMAP_PTR[32 * 0 + 0] = 1;
+    TILEMAP_PTR[32 * 0 + 2] = 1;
+    TILEMAP_PTR[32 * 2 + 0] = 1;
 
-    // Configure BG0 to use Character Block 0 and Screen Block 31
-    REG_BG0CNT = CHARBLOCK_0 | SCREENBLOCK_31 | BG_SIZE_0;
+    TILEMAP_PTR[32 * 0 + 29] = 1;
+    TILEMAP_PTR[32 * 0 + 27] = 1;
+    TILEMAP_PTR[32 * 2 + 29] = 1;
+
+    TILEMAP_PTR[32 * 19 + 0] = 1;
+    TILEMAP_PTR[32 * 19 + 2] = 1;
+    TILEMAP_PTR[32 * 17 + 0] = 1;
+
+    TILEMAP_PTR[32 * 19 + 29] = 1;
+    TILEMAP_PTR[32 * 19 + 27] = 1;
+    TILEMAP_PTR[32 * 17 + 29] = 1;
 }
 
 int main() {
