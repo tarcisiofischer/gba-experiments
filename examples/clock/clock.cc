@@ -2,18 +2,18 @@
 #include <gba.h>
 #include <numbers.h>
 
-static auto constexpr BLK = (0x00 << 0);
-static auto constexpr RED = (0x1F << 0);
+static i16_t constexpr BLK = (0x00 << 0);
+static i16_t constexpr RED = (0x1F << 0);
 
-int div10(int x) { return (x * 0xCCCCCCCDLL) >> 35; }
-int mod10(int x) { return x - ((x * 0xCCCCCCCDLL) >> 35) * 10; }
+u16_t div10(u16_t x) { return x / 10; }
+u16_t mod10(u16_t x) { return x - ((x * 0xCCCCCCCDLL) >> 35) * 10; }
 
-void draw_at(int x, int y, int v)
+void draw_at(i16_t x, i16_t y, i16_t v)
 {
   {
-    u16_t* N = ((u16_t*)&NUMBERS) + 3*5*v;
-    for (int i = 0; i < 3; ++i) {
-      for (int j = 0; j < 5; ++j) {
+    i16_t* N = ((i16_t*)&NUMBERS) + 3*5*v;
+    for (i16_t i = 0; i < 3; ++i) {
+      for (i16_t j = 0; j < 5; ++j) {
         *VRAM.at(x + i, y + j) = (N[3 * j + i] ? RED : BLK);
       }
     }
@@ -24,9 +24,9 @@ int main()
 {
   *REG_DISPCNT = /*BG MODE=*/(3 << 0) | /*SCREEN BG 2 ENABLE=*/(1 << 10);
 
-  int frame_counter = 0;
-  int minutes = 0;
-  int seconds = 0;
+  i16_t frame_counter = 0;
+  i16_t minutes = 0;
+  i16_t seconds = 0;
   while(1) {
     vid_vsync();
 
@@ -50,12 +50,19 @@ int main()
       if (seconds > 59) {
         minutes += 1;
         seconds = 0;
+        if (minutes >= 100) {
+          minutes = 0;
+        }
       }
     } else if (Controller::is_pressed(BTN_B)) {
       seconds -= 1;
       if (seconds < 0) {
-        minutes -= 1;
-        seconds = 59;
+        if (minutes > 0) {
+          minutes -= 1;
+          seconds = 59;
+        } else {
+          seconds = 0;
+        }
       }
     }
   }
