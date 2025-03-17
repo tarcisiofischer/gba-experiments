@@ -53,3 +53,9 @@ gba_add_example(
   SOURCES
   tiles/tiles.cc
 )
+
+gba_add_example(
+  NAME hello-world
+  SOURCES
+  hello-world/hello-world.cc
+)
