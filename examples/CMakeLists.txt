@@ -59,3 +59,10 @@ gba_add_example(
   SOURCES
   hello-world/hello-world.cc
 )
+
+gba_add_example(
+  NAME sprites
+  SOURCES
+  sprites/sprites.cc
+)
+
