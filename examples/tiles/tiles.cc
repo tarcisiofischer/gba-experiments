@@ -11,16 +11,16 @@ void setup_graphics() {
     *REG_DISPCNT = MODE_0 | BG0_ENABLE;
     *REG_BG0CNT = 
       (0b00    << 0)  | // Priority 0 (Highest)
-      (0b00    << 2)  | // Start addr of tile data 0x06000000 + S * 0x4000
+      (0b01    << 2)  | // Start addr of tile data 0x06000000 + S * 0x4000
       (0b00    << 4)  | // Unused
       (0b0     << 6)  | // Mosaic effect 0 (Off)
       (0b0     << 7)  | // Use 16 color map
-      (0b00001 << 8)  | // Starting addr of tile map 0x06000000 + M * 0x800
+      (0b00000 << 8)  | // Starting addr of tile map 0x06000000 + M * 0x800
       (0b0     << 13) | // Screen over / RO
       (0b00    << 15)   // Size of tile map. 0 means 32x32
     ;
-    static auto const TILEMAP_PTR = (volatile u16_t*)(0x06000000 + 1 * 0x800);
-    static auto const TILESET_PTR = (volatile u16_t*)(0x06000000 + 0 * 0x400);
+    static auto const TILEMAP_PTR = (volatile u16_t*)(0x06000000 + 0 * 0x800);
+    static auto const TILESET_PTR = (volatile u16_t*)(0x06000000 + 1 * 0x4000);
 
     const u16_t tile_data[16] = {
         0x0001, 0x3300,

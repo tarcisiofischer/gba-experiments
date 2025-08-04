@@ -5,6 +5,17 @@
 static auto const REG_DISPCNT  = (volatile u16_t*)0x04000000;
 static auto const REG_VCOUNT   = (volatile u16_t*)0x04000006;
 static auto const REG_BG0CNT   = (volatile u16_t*)0x04000008;
+static auto const REG_BG1CNT   = (volatile u16_t*)0x0400000A;
+static auto const REG_BG2CNT   = (volatile u16_t*)0x0400000C;
+static auto const REG_BG3CNT   = (volatile u16_t*)0x0400000E;
+static auto const REG_BG0HOFS  = (volatile u16_t*)0x04000010;
+static auto const REG_BG0VOFS  = (volatile u16_t*)0x04000012;
+static auto const REG_BG1HOFS  = (volatile u16_t*)0x04000014;
+static auto const REG_BG1VOFS  = (volatile u16_t*)0x04000016;
+static auto const REG_BG2HOFS  = (volatile u16_t*)0x04000018;
+static auto const REG_BG2VOFS  = (volatile u16_t*)0x0400001A;
+static auto const REG_BG3HOFS  = (volatile u16_t*)0x0400001C;
+static auto const REG_BG3VOFS  = (volatile u16_t*)0x0400001E;
 static auto const REG_KEYINPUT = (volatile u16_t*)0x04000130;
 static auto const BG_PALETTE   = (volatile u16_t*)0x05000000;
 static auto const OBJ_PALETTE  = (volatile u16_t*)0x05000200;
@@ -35,12 +46,42 @@ static auto constexpr BTN_R      = (1 << 8);
 static auto constexpr BTN_L      = (1 << 9);
 
 struct OAM_attr {
-  char attr0;
-  char attr1;
-  char attr2;
+  u16_t attr0;
+  u16_t attr1;
+  u16_t attr2;
 
-  void x(u16_t v) { attr1 |= ((v & 0x1ff) << 0);  }
-  void y(u8_t v) { attr0 |= ((v & 0xff) << 0);  }
+  // Size  Square   Horizontal  Vertical
+  // 0     8x8      16x8        8x16
+  // 1     16x16    32x8        8x32
+  // 2     32x32    32x16       16x32
+  // 3     64x64    64x32       32x64
+  enum class ObjectSize {
+    _8x8 = 0,
+    _16x16 = 1,
+    _32x32 = 2,
+    _64x64 = 3
+  };
+
+  static constexpr u16_t step16x16(u16_t obj_id) { return 4 * obj_id; }
+  static volatile OAM_attr* get_obj(u16_t obj_id) {
+    return reinterpret_cast<volatile OAM_attr*>(OAM + obj_id * sizeof(OAM_attr));
+  }
+  inline void set_x(u16_t v) volatile {
+    attr1 &= ~0x1ff;
+    attr1 |= v & 0x1ff;
+  }
+  inline void set_y(u8_t v) volatile {
+    attr0 &= ~0xff;
+    attr0 |= v & 0xff;
+  }
+  inline void set_size(ObjectSize size) volatile {
+    attr1 &= ~(0b11 << 14);
+    attr1 |= (static_cast<u16_t>(size) << 14);
+  }
+  inline void set_sprite(u16_t sprite_id) volatile {
+    attr2 &= ~0x1ff;
+    attr2 |= (sprite_id & 0x1ff);
+  }
 };
 
 struct _VRAM_t {
