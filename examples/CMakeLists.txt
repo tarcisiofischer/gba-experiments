@@ -1,7 +1,7 @@
 set(CMAKE_CXX_STANDARD 20)
 
 function(gba_add_example)
-  set(oneValueArgs NAME)
+  set(oneValueArgs NAME TILEMAP)
   set(multiValueArgs SOURCES SPRITESHEETS)
   cmake_parse_arguments(arg "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -28,19 +28,20 @@ function(gba_add_example)
     -lclang_rt.builtins
   )
   set(RESOLVED_TARGET_FILE $<TARGET_FILE:${arg_NAME}>)
-  set(SS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/${arg_NAME}_spritesheets/")
+  set(ASSETS_OUTPUT_DIR "${CMAKE_BINARY_DIR}/${arg_NAME}_assets/")
   add_custom_command(
-    OUTPUT "${SS_OUTPUT_DIR}"
-    COMMAND mkdir -p "${SS_OUTPUT_DIR}"
-    COMMENT "Generating spritesheet output dir ${SS_OUTPUT_DIR}"
+    OUTPUT "${ASSETS_OUTPUT_DIR}"
+    COMMAND mkdir -p "${ASSETS_OUTPUT_DIR}"
+    COMMENT "Generating assets output dir ${SS_ASSETS_DIR}"
     VERBATIM
   )
-  add_custom_target(${arg_NAME}_spritesheet_outdir DEPENDS "${SS_OUTPUT_DIR}")
-  add_dependencies(${arg_NAME} ${arg_NAME}_spritesheet_outdir)
+  add_custom_target(${arg_NAME}_assets_outdir DEPENDS "${ASSETS_OUTPUT_DIR}")
+  add_dependencies(${arg_NAME} ${arg_NAME}_assets_outdir)
+  target_include_directories(${arg_NAME} PRIVATE ${ASSETS_OUTPUT_DIR})
   foreach (SS ${arg_SPRITESHEETS})
     get_filename_component(SS_TARGET "${SS}" NAME_WE)
     set(SS_TARGET "spritesheet_${SS_TARGET}")
-    set(SS_OUTPUT "${SS_OUTPUT_DIR}/${SS_TARGET}.inc")
+    set(SS_OUTPUT "${ASSETS_OUTPUT_DIR}/${SS_TARGET}.inc")
     add_custom_command(
       OUTPUT "${SS_OUTPUT}"
       COMMAND img2bytes "${CMAKE_CURRENT_SOURCE_DIR}/${SS}" "${SS_OUTPUT}"
@@ -50,9 +51,23 @@ function(gba_add_example)
     )
     add_custom_target(${SS_TARGET} DEPENDS "${SS_OUTPUT}")
     add_dependencies(${arg_NAME} ${SS_TARGET})
-    add_dependencies(${SS_TARGET} ${arg_NAME}_spritesheet_outdir)
+    add_dependencies(${SS_TARGET} ${arg_NAME}_assets_outdir)
   endforeach()
-  target_include_directories(${arg_NAME} PRIVATE ${SS_OUTPUT_DIR})
+  if (DEFINED arg_TILEMAP)
+    set(TILEMAP_TARGET "tilemap_${SS_TARGET}")
+    set(TILEMAP_OUTPUT "${ASSETS_OUTPUT_DIR}/tilemap.inc")
+    add_custom_command(
+      OUTPUT "${TILEMAP_OUTPUT}"
+      COMMAND prepare-tilemaps "${CMAKE_CURRENT_SOURCE_DIR}/${arg_TILEMAP}" "${TILEMAP_OUTPUT}"
+      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${arg_TILEMAP}"
+      COMMENT "Generating tilemaps"
+      VERBATIM
+    )
+    add_custom_target(${TILEMAP_TARGET} DEPENDS "${TILEMAP_OUTPUT}")
+    add_dependencies(${arg_NAME} ${TILEMAP_TARGET})
+    add_dependencies(${TILEMAP_TARGET} ${arg_NAME}_assets_outdir)
+  endif()
+
   add_custom_command(
     TARGET ${arg_NAME}
     POST_BUILD
@@ -99,5 +114,7 @@ gba_add_example(
   SPRITESHEETS
   spritesheet/chicken.png
   spritesheet/bg.png
+  TILEMAP
+  spritesheet/foo.json
 )
 
