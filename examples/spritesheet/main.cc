@@ -150,7 +150,6 @@ u16_t next_sprite(ChickenState s, u16_t c_sprite) {
 }
 
 void update_oam() {
-  // set_obj_sprite(0, current_sprite);
   auto* obj = OAM_attr::get_obj(0);
   obj->set_sprite(OAM_attr::step16x16(current_sprite));
   obj->set_x(x);

@@ -118,3 +118,11 @@ gba_add_example(
   spritesheet/foo.json
 )
 
+gba_add_example(
+  NAME sound
+  SOURCES
+  sound/main.cc
+  SPRITESHEETS
+  sound/sound.png
+)
+
