@@ -49,9 +49,9 @@ function(gba_add_example)
       COMMENT "Generating spritesheet ${SS_OUTPUT}"
       VERBATIM
     )
-    add_custom_target(${SS_TARGET} DEPENDS "${SS_OUTPUT}")
-    add_dependencies(${arg_NAME} ${SS_TARGET})
-    add_dependencies(${SS_TARGET} ${arg_NAME}_assets_outdir)
+    add_custom_target(${arg_NAME}_${SS_TARGET} DEPENDS "${SS_OUTPUT}")
+    add_dependencies(${arg_NAME} ${arg_NAME}_${SS_TARGET})
+    add_dependencies(${arg_NAME}_${SS_TARGET} ${arg_NAME}_assets_outdir)
   endforeach()
   if (DEFINED arg_TILEMAP)
     set(TILEMAP_TARGET "tilemap_${SS_TARGET}")
@@ -124,5 +124,14 @@ gba_add_example(
   sound/main.cc
   SPRITESHEETS
   sound/sound.png
+)
+
+gba_add_example(
+  NAME space-shooter
+  SOURCES
+  space-shooter/main.cc
+  SPRITESHEETS
+  space-shooter/objects.png
+  space-shooter/bg.png
 )
 

@@ -121,16 +121,37 @@ struct _VRAM_t {
 };
 static _VRAM_t VRAM;
 
-struct Controller {
-  static inline bool is_pressed(u16_t btn) { return ~(*REG_KEYINPUT) & btn; }
-  static inline bool is_released(u16_t btn) { return !Controller::is_pressed(btn); }
-};
-
 void vid_vsync()
 {
   while(*REG_VCOUNT >= 160);
   while(*REG_VCOUNT < 160);
 }
+
+// Controller
+struct Controller {
+  static inline bool is_pressed(u16_t btn) { return ~(*REG_KEYINPUT) & btn; }
+  static inline bool is_released(u16_t btn) { return !Controller::is_pressed(btn); }
+
+  inline bool is_just_pressed(u16_t btn) {
+    return this->_is_just_pressed;
+  }
+
+  inline bool is_just_released(u16_t btn) {
+    return this->_is_just_released;
+  }
+
+  void update() {
+    this->_is_just_pressed = this->_pREG_KEYINPUT & ~*REG_KEYINPUT;
+    this->_is_just_released = ~this->_pREG_KEYINPUT & *REG_KEYINPUT;
+    this->_pREG_KEYINPUT = *REG_KEYINPUT;
+  }
+
+private:
+  // Compare with REG_KEYINPUT to find out if the key has been just pressed
+  u16_t _pREG_KEYINPUT = 0xffff;
+  u16_t _is_just_pressed = 0x0000;
+  u16_t _is_just_released = 0x0000;
+};
 
 // Sound
 static const u16_t _ = 0;
@@ -233,7 +254,14 @@ struct Sound {
     this->_song_pos++;
     if (this->_song_pos > this->_song_size) {
       this->_song_pos = 0;
+      if (this->_stop_on_finish) {
+        this->stop();
+      }
     }
+  }
+
+  void set_stop_on_finish(bool v) {
+    this->_stop_on_finish = v;
   }
 
   void pause() {
@@ -267,6 +295,7 @@ private:
   u16_t _ch2_type = Sound::TypeB;
   u16_t _ch1_volume = 0b1111;
   u16_t _ch2_volume = 0b1000;
+  bool _stop_on_finish = false;
 };
 
 #endif
