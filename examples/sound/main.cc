@@ -45,20 +45,23 @@ int main() {
   bool is_pressed_left = false;
   bool is_pressed_up = false;
   bool is_pressed_down = false;
+
   u16_t song1[] = {
     C2, _, D2, _, E2, _, F2, _, G2, _, A2, _, B2, _,
     C3, _, D3, _, E3, _, F3, _, G3, _, A3, _, B3, _,
-    C4, _, D4, _, E4, _, F4, _, G4, _, A4, _, B4, _
+    C4, _, D4, _, E4, _, F4, _, G4, _, A4, _, B4, _,
+    C5, _, D5, _, E5, _, F5, _, G5, _, A5, _, B5, _
   };
   Sound m1 = Sound(song1, sizeof(song1) / sizeof(u16_t));
+
   u16_t song2[] = {
-    E4, D4, E4, D4, E4, B3, D4, C4, A3, _,
-    C3, E3, A3, B3, _,
-    E3, G3, B3, C4, _,
-    E3, E4, D4, E4, D4, E4, B3, D4, C4, A3, _,
-    C3, E3, A3, B3, _,
-    E3, C4, B3, A3, _};
+    E5, Eb5, E5, Eb5, E5, B4, D5, C5, A4, _,
+    C4, E4, A4, B4, _,
+    E4, Gs4, B4, C5, _,
+    E4, Eb5, E5, Eb5, E5, B4, D5, C5, A4, _
+  };
   Sound m2 = Sound(song2, sizeof(song2) / sizeof(u16_t), 10);
+
   u16_t song3_ch1[] = {
     E4, E4, F4, G4,
     G4, F4, E4, D4,
@@ -104,8 +107,23 @@ int main() {
     C4, D4, E4, G4, A4, G4, F4, E4
   };
   Sound m4 = Sound(song4_ch1, song4_ch2, sizeof(song4_ch1) / sizeof(u16_t), 12);
+  m4.config_ch1_volume(6);
 
-  Sound* playlist[] = {&m1, &m2, &m3, &m4};
+  u16_t song5_ch1[] = {
+    C3, _, A2, F2, _, C2, C2, C2, D2, F2, Bb2, D3, C3, _, _,
+    A2, Bb2, G2, E2, Bb2, A2, F2, _,
+    A2, G2, D2, E2, F2, G2, _, _
+  };
+  Sound m5 = Sound(song5_ch1, sizeof(song5_ch1) / sizeof(u16_t), 12);
+
+  u16_t song6_ch1[] = {
+    E4, E4, E4, _, C4, E4, _, G4, _, G3, _, C4, _, G3, _, E3, _, A3, B3,
+    Bb3, A3, G3, _, E4, G4, A4, _, F4, G4, _, E4, C4, D4, B3, _, C4, G3, E3, A3, B3, _, Bb3, A3, _, G3, _, E4, G4, A4, F4, G4, _, E4, C4, D4, B3
+
+  };
+  Sound m6 = Sound(song6_ch1, sizeof(song6_ch1) / sizeof(u16_t), 10);
+
+  Sound* playlist[] = {&m1, &m5, &m2, &m3, &m4, &m6};
   i16_t selected_song = 0;
 
   u16_t sound_types[] = {Sound::TypeA, Sound::TypeB, Sound::TypeC, Sound::TypeD};
