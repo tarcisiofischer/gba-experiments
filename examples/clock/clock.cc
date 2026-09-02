@@ -1,5 +1,5 @@
-#include <types.h>
-#include <gba.h>
+#include <libgba/types.h>
+#include <libgba/gba.h>
 #include <numbers.h>
 
 static i16_t constexpr BLK = (0x00 << 0);

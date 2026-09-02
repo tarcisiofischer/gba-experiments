@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.16)
 project(GBADev)
 
-enable_language(ASM)
-set(CMAKE_ASM_COMPILER "$ENV{GBA_LLVM}/bin/clang")
-set(CMAKE_C_COMPILER "$ENV{GBA_LLVM}/bin/clang")
-set(CMAKE_CXX_COMPILER "$ENV{GBA_LLVM}/bin/clang++")
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/libgba/cmake)
-include(GBAExecutable)
+# Compilers are configured via the GBA toolchain file.
+# Configure with: cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/libgba/cmake/gba-toolchain.cmake
 
-add_subdirectory(libgba/)
+find_package(libgba REQUIRED
+  PATHS ${LIBGBA_PATH}
+  NO_DEFAULT_PATH
+)
+
 add_subdirectory(examples/)
 

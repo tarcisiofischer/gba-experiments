@@ -1,5 +1,5 @@
-#include <types.h>
-#include <gba.h>
+#include <libgba/types.h>
+#include <libgba/gba.h>
 
 #define MAP_BASE ((volatile u16_t*)0x06008000)  // Screen Block 31
 

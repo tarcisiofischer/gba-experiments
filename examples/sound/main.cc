@@ -1,4 +1,4 @@
-#include <gba.h>
+#include <libgba/gba.h>
 
 void setup_display() {
   /**

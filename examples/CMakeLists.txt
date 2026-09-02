@@ -26,10 +26,6 @@ gba_exec(
   SOURCES
   hello-world/hello-world.cc
 )
-target_link_libraries(
-  hello-world
-  libgba-base
-)
 
 gba_exec(
   NAME sprites

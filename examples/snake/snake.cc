@@ -1,5 +1,5 @@
-#include <types.h>
-#include <gba.h>
+#include <libgba/types.h>
+#include <libgba/gba.h>
 
 static auto constexpr BLK = (0x00 << 0);
 static auto constexpr RED = (0x1F << 0);

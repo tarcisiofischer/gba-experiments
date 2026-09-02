@@ -1,5 +1,5 @@
-#include <gba.h>
-#include <random.h>
+#include <libgba/gba.h>
+#include <libgba/random.h>
 
 void setup_display() {
   /**

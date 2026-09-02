@@ -1,6 +1,6 @@
-#include <types.h>
-#include <gba.h>
-#include <random.h>
+#include <libgba/types.h>
+#include <libgba/gba.h>
+#include <libgba/random.h>
 
 static auto const TILEMAP_PTR = (volatile u16_t*)(0x06000000 + 1 * 0x800);
 static auto const TILESET_PTR = (volatile u16_t*)(0x06000000 + 0 * 0x400);

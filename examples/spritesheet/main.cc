@@ -1,6 +1,6 @@
-#include <types.h>
-#include <gba.h>
-#include <random.h>
+#include <libgba/types.h>
+#include <libgba/gba.h>
+#include <libgba/random.h>
 
 // graphics.cc
 void setup_display() {
