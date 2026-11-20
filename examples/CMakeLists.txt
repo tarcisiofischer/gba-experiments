@@ -28,6 +28,13 @@ gba_exec(
 )
 
 gba_exec(
+  NAME text
+  SOURCES
+  text/text.cc
+  ENABLE_TXT
+)
+
+gba_exec(
   NAME sprites
   SOURCES
   sprites/sprites.cc
